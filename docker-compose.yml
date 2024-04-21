@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    depends_on:
+      - database
+    restart: always
+    volumes:
+      - ./src/tg_storage:/app/tg_storage
+    networks:
+      mynet:
+        ipv4_address: 10.5.0.3
+
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      mynet:
+        ipv4_address: 10.5.0.4
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
